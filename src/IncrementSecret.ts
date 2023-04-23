@@ -4,7 +4,7 @@ export class IncrementSecret extends SmartContract {
   @state(Field) x = State<Field>();
 
   @method initState(salt: Field, firstSecret: Field) {
-    this.x.set(Poseidon.hash([salt, firstSecret]));
+    this.x.set(Poseidon.hash([firstSecret]));
   }
 
   @method incrementSecret(salt: Field, secret: Field) {
