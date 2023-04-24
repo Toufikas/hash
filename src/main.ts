@@ -18,8 +18,8 @@ const key = Field(30);
 const value = Field(120);
 map.set(key, value);
 map.set(value, key);
-const rt = map.getRoot();
-const wt = map.getWitness(key);
+const rt = map.getRoot().toJSON();
+const wt = map.getWitness(key).toJSON();
 
 console.log(rt, wt);
 
