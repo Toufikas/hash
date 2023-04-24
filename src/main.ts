@@ -1,7 +1,5 @@
 import { IncrementSecret } from './IncrementSecret.js';
-import * as net from 'net';
-import { createConnection } from 'net';
-import { promises as fs } from 'fs';
+import net, { createConnection } from 'net';
 
 import {
   isReady,
@@ -45,13 +43,11 @@ console.log('SnarkyJS loaded');
 
 
 
-
 const SOCKET_PATH = '/tmp/mysocket.sock';
 
 async function startServer() {
   console.log('server init');
-
-  const server = net.createServer(async (socket) => {
+  const server = net.createServer((socket) => {
     console.log('Server: Client connected');
     console.log('server tried to connect');
 
@@ -78,24 +74,21 @@ async function startServer() {
   server.on('error', (error) => {
     console.log(`Server: Error: ${error}`);
   });
+
+  await new Promise((resolve) => server.on('listening', resolve));
 }
 
 async function startClient() {
   console.log('client init');
-
   const client = createConnection(SOCKET_PATH);
-  client.on('connect', () => {
-    console.log('Client: Connected to server');
-    client.write('Client: Hello, server!');
-    console.log('client wrote');
-  });
 
+  await new Promise((resolve) => client.on('connect', resolve));
+  console.log('Client: Connected to server');
   console.log('client tried connected');
 
   client.on('data', (data) => {
     console.log(`Client: Received message: ${data.toString()}`);
   });
-
   console.log('client set listener');
 
   client.on('close', () => {
@@ -105,10 +98,20 @@ async function startClient() {
   client.on('error', (error) => {
     console.log(`Client: Error: ${error}`);
   });
+
+  client.write('Client: Hello, server!');
+  console.log('client wrote');
+
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  client.end();
 }
 
-await startServer();
-await startClient();
+async function main() {
+  await startServer();
+  await startClient();
+}
+
+main().catch(console.error);
 
 
 
