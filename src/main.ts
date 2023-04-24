@@ -4,6 +4,7 @@ import {
   shutdown,
   Field,
   Mina,
+  MerkleTree,
   PrivateKey,
   AccountUpdate,
 } from 'snarkyjs';
