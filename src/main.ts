@@ -47,17 +47,15 @@ console.log('SnarkyJS loaded');
 
   console.log('making proof 1')
 
-  const proof1 = await Add.addNumber(Field(4), proof0, Field(4));
 
-  console.log('making proof 2')
 
-  const proof2 = await Add.add(Field(4), proof1, proof0);
 
   console.log('verifying proof 2');
   console.log('proof 2 data', proof2.publicInput.toString());
 
-  const ok = await verify(proof2.toJSON(), verificationKey);
   console.log('ok', ok);
+
+
 const map = new MerkleMap();
 const key = Field(30);
 const value = Field(120);
