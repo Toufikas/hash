@@ -1,9 +1,7 @@
 import { IncrementSecret } from './IncrementSecret.js';
-import net from 'net';
-import { openSync, readSync, writeSync, closeSync } from 'fs';
-import Semaphore from 'node-semaphore';
 
-import fs from 'fs';
+import net from 'net';
+import { AddressInfo } from 'net';
 
 import {
   isReady,
@@ -58,58 +56,32 @@ console.log('SnarkyJS loaded');
 
 
 
-const INPUT_FILE = '/path/to/input/file';
-const OUTPUT_FILE = '/path/to/output/file';
 
-const client = new net.Socket();
+const server = net.createServer((socket) => {
+  console.log('Client connected');
 
-const inputSemaphore = Semaphore(1);
-const outputSemaphore = Semaphore(1);
+  socket.on('data', (data) => {
+    console.log(`Received data: ${data.toString()}`);
 
-client.connect(8000, '127.0.0.1', () => {
-    console.log('Connected to Go app');
+    // Echo the received data back to the client
+    socket.write(`Echo: ${data.toString()}\n`);
+  });
 
-    // Loop to read from input file and write to output file
-    while (true) {
-        // Wait for input semaphore
-        inputSemaphore.take(async () => {
-            try {
-                // Read input data from file
-                const inputBuffer = Buffer.alloc(1024);
-                const inputFileDescriptor = openSync(INPUT_FILE, 'r');
-                const bytesRead = readSync(inputFileDescriptor, inputBuffer, 0, 1024, null);
-                closeSync(inputFileDescriptor);
-                const inputData = inputBuffer.slice(0, bytesRead);
+  socket.on('close', () => {
+    console.log('Client disconnected');
+  });
 
-                // Process input data (example only)
-                const outputData = inputData.toString().toUpperCase();
-
-                // Wait for output semaphore
-                outputSemaphore.take(async () => {
-                    try {
-                        // Write output data to file
-                        const outputFileDescriptor = openSync(OUTPUT_FILE, 'w');
-                        const bytesWritten = writeSync(outputFileDescriptor, outputData, 0, outputData.length, null);
-                        closeSync(outputFileDescriptor);
-
-                        // Signal Go app to read output data
-                        client.write('Ready to read output');
-                    } finally {
-                        outputSemaphore.leave();
-                    }
-                });
-            } finally {
-                inputSemaphore.leave();
-            }
-
-            // Wait for Go app to finish reading output data
-            client.once('data', (data) => {
-                console.log('Go app has read output data:', data.toString());
-            });
-        });
-    }
+  socket.on('error', (err) => {
+    console.error(`Socket error: ${err}`);
+  });
 });
 
+// Bind the server to a Unix domain socket
+const socketPath = '/tmp/mysocket.sock';
+server.listen(socketPath, () => {
+  const { address, port } = server.address() as AddressInfo;
+  console.log(`Server listening on ${address}:${port}`);
+});
 
    
 
