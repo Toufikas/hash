@@ -1,7 +1,7 @@
 import { IncrementSecret } from './IncrementSecret.js';
-import fs from 'fs';
 import net from 'net';
-import { AddressInfo } from 'net';
+import { Socket } from 'net';
+
 
 import {
   isReady,
@@ -42,6 +42,47 @@ const Add = Experimental.ZkProgram({
 console.log('SnarkyJS loaded');
 
 
+const SOCKET_FILE = '/tmp/mysocket.sock';
+
+// Server
+const server = net.createServer((socket: Socket) => {
+  console.log('Client connected.');
+
+  socket.on('data', (data) => {
+    console.log(`Received data from client: ${data.toString()}`);
+    socket.write(`Received your message: ${data.toString()}`);
+  });
+
+  socket.on('end', () => {
+    console.log('Client disconnected.');
+  });
+});
+
+server.on('error', (err) => {
+  console.error(`Server error: ${err}`);
+});
+
+server.listen(SOCKET_FILE, () => {
+  console.log(`Server listening on socket file: ${SOCKET_FILE}`);
+});
+
+// Client
+const client = new net.Socket();
+
+client.connect(SOCKET_FILE, () => {
+  console.log('Connected to server.');
+  client.write('Hello, server!');
+});
+
+client.on('data', (data) => {
+  console.log(`Received data from server: ${data.toString()}`);
+  client.destroy(); // close the client socket
+});
+
+client.on('close', () => {
+  console.log('Connection closed.');
+});
+
 
 
   console.log('compiling...');
@@ -54,45 +95,7 @@ console.log('SnarkyJS loaded');
 
 
 const server = net.createServer((socket) => {
-  console.log('Server: client connected');
-  socket.write('Hello from server!');
-
-  socket.on('data', (data) => {
-    console.log(`Server: received data: ${data}`);
-    socket.write(`Server: received ${data.length} bytes`);
-  });
-
-  socket.on('end', () => {
-    console.log('Server: client disconnected');
-  });
-});
-
-const SOCK_PATH = './test.sock';
-
-if (fs.existsSync(SOCK_PATH)) {
-  fs.unlinkSync(SOCK_PATH);
-}
-
-server.listen(SOCK_PATH, () => {
-  console.log('Server listening on ' + SOCK_PATH);
-  
-  // Connect to the server via the same socket
-  const client = net.connect(SOCK_PATH, () => {
-    console.log('Client: connected to server');
-    client.write('Hello from client!');
-  });
-
-  client.on('data', (data) => {
-    console.log(`Client: received data: ${data}`);
-    client.end();
-  });
-
-  client.on('end', () => {
-    console.log('Client: disconnected from server');
-  });
-});
-
-
+  con
 
 
 //  console.log('proof 2 data', proof0.publicInput.toString());
