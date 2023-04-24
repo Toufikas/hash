@@ -1,6 +1,7 @@
 import { IncrementSecret } from './IncrementSecret.js';
 import * as net from 'net';
-import * as fs from 'fs';
+import { createConnection } from 'net';
+import { promises as fs } from 'fs';
 
 import {
   isReady,
@@ -43,62 +44,75 @@ console.log('SnarkyJS loaded');
 
 
 
-const serverSocketFile = '/tmp/server.sock';
-const clientSocketFile = '/tmp/client.sock';
 
-function startServer() {
-  const server = net.createServer((socket) => {
-    console.log('Server: client connected');
+
+const SOCKET_PATH = '/tmp/mysocket.sock';
+
+async function startServer() {
+  const server = net.createServer(async (socket) => {
+    console.log('Server: Client connected');
 
     socket.on('data', (data) => {
-      console.log(`Server: received message: ${data}`);
-      socket.write(`Server: got your message: ${data}`);
+      console.log(`Server: Received message: ${data.toString()}`);
+      socket.write('Server: Message received');
     });
 
-    socket.on('end', () => {
-      console.log('Server: client disconnected');
+    socket.on('close', () => {
+      console.log('Server: Client disconnected');
+    });
+
+    socket.on('error', (error) => {
+      console.log(`Server: Error: ${error}`);
     });
   });
 
-  server.listen(serverSocketFile, () => {
-    console.log(`Server: listening on socket file ${serverSocketFile}`);
+  server.listen(SOCKET_PATH, () => {
+    console.log(`Server: Listening on socket ${SOCKET_PATH}`);
+  });
+
+  server.on('error', (error) => {
+    console.log(`Server: Error: ${error}`);
   });
 }
 
-function startClient() {
-  const client = net.createConnection(clientSocketFile, () => {
-    console.log(`Client: connected to server on socket file ${clientSocketFile}`);
-    client.write('Hello, server!');
+async function startClient() {
+  const client = createConnection(SOCKET_PATH);
+
+  client.on('connect', () => {
+    console.log('Client: Connected to server');
   });
 
   client.on('data', (data) => {
-    console.log(`Client: received message: ${data}`);
-    client.end();
+    console.log(`Client: Received message: ${data.toString()}`);
   });
 
-  client.on('end', () => {
-    console.log('Client: disconnected from server');
+  client.on('close', () => {
+    console.log('Client: Disconnected from server');
   });
+
+  client.on('error', (error) => {
+    console.log(`Client: Error: ${error}`);
+  });
+
+  client.write('Client: Hello, server!');
 }
 
-function mainloop() {
-  // Create the socket file for the server
-  if (fs.existsSync(serverSocketFile)) {
-    fs.unlinkSync(serverSocketFile);
-  }
-
-  // Create the socket file for the client
-  if (fs.existsSync(clientSocketFile)) {
-    fs.unlinkSync(clientSocketFile);
-  }
+async function main() {
+  // Remove the socket file if it exists
+  try {
+    await fs.unlink(SOCKET_PATH);
+  } catch (error) {}
 
   // Start the server and the client
-  startServer();
-  startClient();
+  await Promise.all([startServer(), startClient()]);
 }
 
+main().catch((error) => {
+  console.log(`Error: ${error}`);
+});
 
-mainloop();
+
+
 
 
 
