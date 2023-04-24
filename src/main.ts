@@ -1,5 +1,8 @@
 import { IncrementSecret } from './IncrementSecret.js';
 import net from 'net';
+import { openSync, readSync, writeSync, closeSync } from 'fs';
+import Semaphore from 'node-semaphore';
+
 import fs from 'fs';
 
 import {
@@ -55,37 +58,60 @@ console.log('SnarkyJS loaded');
 
 
 
-const readSemaphore = new fs.promises.Semaphore('/path/to/semaphore-for-read');
-const writeSemaphore = new fs.promises.Semaphore('/path/to/semaphore-for-write');
-const inputMemoryFile = '/path/to/input/memory/file';
-const outputMemoryFile = '/path/to/output/memory/file';
+const INPUT_FILE = '/path/to/input/file';
+const OUTPUT_FILE = '/path/to/output/file';
 
 const client = new net.Socket();
 
-// Connect to the Go app's TCP server
-client.connect(8000, '127.0.0.1', async () => {
+const inputSemaphore = Semaphore(1);
+const outputSemaphore = Semaphore(1);
+
+client.connect(8000, '127.0.0.1', () => {
     console.log('Connected to Go app');
 
+    // Loop to read from input file and write to output file
     while (true) {
-        // Wait for the Go app to notify us that it has finished writing
-        await readSemaphore.wait();
+        // Wait for input semaphore
+        inputSemaphore.take(async () => {
+            try {
+                // Read input data from file
+                const inputBuffer = Buffer.alloc(1024);
+                const inputFileDescriptor = openSync(INPUT_FILE, 'r');
+                const bytesRead = readSync(inputFileDescriptor, inputBuffer, 0, 1024, null);
+                closeSync(inputFileDescriptor);
+                const inputData = inputBuffer.slice(0, bytesRead);
 
-        // Read the data from the memory file
-        const inputData = fs.readFileSync(inputMemoryFile);
+                // Process input data (example only)
+                const outputData = inputData.toString().toUpperCase();
 
-        console.log('Received data from Go app:', inputData.toString());
+                // Wait for output semaphore
+                outputSemaphore.take(async () => {
+                    try {
+                        // Write output data to file
+                        const outputFileDescriptor = openSync(OUTPUT_FILE, 'w');
+                        const bytesWritten = writeSync(outputFileDescriptor, outputData, 0, outputData.length, null);
+                        closeSync(outputFileDescriptor);
 
-        // Process the data and generate a response
-        const outputData = Buffer.from('Response data');
+                        // Signal Go app to read output data
+                        client.write('Ready to read output');
+                    } finally {
+                        outputSemaphore.leave();
+                    }
+                });
+            } finally {
+                inputSemaphore.leave();
+            }
 
-        // Write the response to the memory file
-        fs.writeFileSync(outputMemoryFile, outputData);
-
-        // Notify the Go app that we're done writing
-        await writeSemaphore.post();
+            // Wait for Go app to finish reading output data
+            client.once('data', (data) => {
+                console.log('Go app has read output data:', data.toString());
+            });
+        });
     }
 });
 
+
+   
 
 
 
