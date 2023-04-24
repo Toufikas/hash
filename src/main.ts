@@ -101,7 +101,7 @@ console.log('client');
   client.write('Client: Hello, server!');
 }
 
-async function mainloop() {
+
   // Remove the socket file if it exists
   try {
     await fs.unlink(SOCKET_PATH);
@@ -109,9 +109,7 @@ async function mainloop() {
 console.log('main');
   // Start the server and the client
   await Promise.all([startServer(), startClient()]);
-}
 
-mainloop()
 
 
 
