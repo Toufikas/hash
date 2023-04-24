@@ -1,7 +1,6 @@
 import { IncrementSecret } from './IncrementSecret.js';
-import net from 'net';
-import fs from 'fs';
-
+import * as net from 'net';
+import * as fs from 'fs';
 
 import {
   isReady,
@@ -43,51 +42,63 @@ console.log('SnarkyJS loaded');
 
 
 
-const SOCKET_PATH = '/tmp/mysocket';
 
-const server = net.createServer((socket) => {
-  console.log('Server: Client connected');
-  socket.on('data', (data) => {
-    console.log(`Server: Received data: ${data.toString()}`);
-    socket.write(`Server: Received ${data.length} bytes`);
+const serverSocketFile = '/tmp/server.sock';
+const clientSocketFile = '/tmp/client.sock';
+
+function startServer() {
+  const server = net.createServer((socket) => {
+    console.log('Server: client connected');
+
+    socket.on('data', (data) => {
+      console.log(`Server: received message: ${data}`);
+      socket.write(`Server: got your message: ${data}`);
+    });
+
+    socket.on('end', () => {
+      console.log('Server: client disconnected');
+    });
   });
-  socket.on('end', () => {
-    console.log('Server: Client disconnected');
+
+  server.listen(serverSocketFile, () => {
+    console.log(`Server: listening on socket file ${serverSocketFile}`);
   });
-});
+}
 
-server.on('error', (err) => {
-  console.error(`Server: Error: ${err}`);
-});
+function startClient() {
+  const client = net.createConnection(clientSocketFile, () => {
+    console.log(`Client: connected to server on socket file ${clientSocketFile}`);
+    client.write('Hello, server!');
+  });
 
-server.listen(SOCKET_PATH, () => {
-  console.log(`Server: Listening on ${SOCKET_PATH}`);
-});
+  client.on('data', (data) => {
+    console.log(`Client: received message: ${data}`);
+    client.end();
+  });
 
-const client = new net.Socket();
+  client.on('end', () => {
+    console.log('Client: disconnected from server');
+  });
+}
 
-client.on('connect', () => {
-  console.log('Client: Connected');
-  client.write('Hello, server!');
-});
+function mainloop() {
+  // Create the socket file for the server
+  if (fs.existsSync(serverSocketFile)) {
+    fs.unlinkSync(serverSocketFile);
+  }
 
-client.on('data', (data) => {
-  console.log(`Client: Received data: ${data.toString()}`);
-  client.end();
-});
+  // Create the socket file for the client
+  if (fs.existsSync(clientSocketFile)) {
+    fs.unlinkSync(clientSocketFile);
+  }
 
-client.on('end', () => {
-  console.log('Client: Disconnected');
-});
+  // Start the server and the client
+  startServer();
+  startClient();
+}
 
-client.on('error', (err) => {
-  console.error(`Client: Error: ${err}`);
-});
 
-client.connect(SOCKET_PATH, () => {
-  console.log(`Client: Connected to server at ${SOCKET_PATH}`);
-});
-
+mainloop();
 
 
 
