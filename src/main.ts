@@ -49,6 +49,8 @@ console.log('SnarkyJS loaded');
 const SOCKET_PATH = '/tmp/mysocket.sock';
 
 async function startServer() {
+console.log('server');
+
   const server = net.createServer(async (socket) => {
     console.log('Server: Client connected');
 
@@ -76,8 +78,10 @@ async function startServer() {
 }
 
 async function startClient() {
-  const client = createConnection(SOCKET_PATH);
 
+console.log('client');
+
+  const client = createConnection(SOCKET_PATH);
   client.on('connect', () => {
     console.log('Client: Connected to server');
   });
@@ -102,7 +106,7 @@ async function main() {
   try {
     await fs.unlink(SOCKET_PATH);
   } catch (error) {}
-
+console.log('main');
   // Start the server and the client
   await Promise.all([startServer(), startClient()]);
 }
