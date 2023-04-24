@@ -95,9 +95,6 @@ server.listen(SOCKET_FILE, () => {
 //  const proof0 = await Add.init(Field(0));
 
 
-const server = net.createServer((socket) => {
-  con
-
 
 //  console.log('proof 2 data', proof0.publicInput.toString());
 
