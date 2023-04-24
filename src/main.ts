@@ -1,7 +1,6 @@
 import { IncrementSecret } from './IncrementSecret.js';
-import net from 'net';
-import { Socket } from 'net';
-
+import * as net from 'net';
+import * as fs from 'fs';
 
 import {
   isReady,
@@ -43,40 +42,43 @@ console.log('SnarkyJS loaded');
 
 
 
-const socketPath = '/tmp/test.sock';
 
+const SOCKET_FILE = '/tmp/my-socket.sock';
+
+// Create a Unix domain socket server
 const server = net.createServer((socket) => {
-  console.log('Server: client connected');
+  console.log('Client connected');
 
+  // When the server receives data from the client, log it and send a response
   socket.on('data', (data) => {
-    console.log('Server: received data:', data.toString());
-
-    // Write back to the client
-    socket.write(`Server received data: ${data.toString()}`);
+    console.log('Received data from client:', data.toString());
+    socket.write('Response from server');
   });
 
+  // When the client disconnects, log it
   socket.on('end', () => {
-    console.log('Server: client disconnected');
+    console.log('Client disconnected');
   });
 });
 
-server.listen(socketPath, () => {
-  console.log('Server: listening on', socketPath);
+// Listen for connections on the Unix domain socket
+server.listen(SOCKET_FILE, () => {
+  console.log('Server listening on', SOCKET_FILE);
 
-  // Create a client connection to the server
-  const client = net.createConnection(socketPath, () => {
-    console.log('Client: connected to server');
+  // Connect to the Unix domain socket as a client
+  const client = net.createConnection(SOCKET_FILE, () => {
+    console.log('Connected to server');
 
     // Send a message to the server
-    client.write('Hello, server!');
+    client.write('Hello from client');
   });
 
+  // When the client receives data from the server, log it
   client.on('data', (data) => {
-    console.log('Client: received data:', data.toString());
-  });
+    console.log('Received data from server:', data.toString());
 
-  client.on('end', () => {
-    console.log('Client: disconnected from server');
+    // Disconnect from the server
+    client.end();
   });
 });
 
