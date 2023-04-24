@@ -1,4 +1,5 @@
 import { IncrementSecret } from './IncrementSecret.js';
+import net from 'net';
 import {
   isReady,
   shutdown,
@@ -17,7 +18,6 @@ import {
   MerkleWitness,
   MerkleMapWitness,
   verify,
-  net,
 } from 'snarkyjs';
 
 await isReady;
