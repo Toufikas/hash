@@ -1,6 +1,7 @@
 import { IncrementSecret } from './IncrementSecret.js';
-import net from 'net';
-
+import * as net from 'net';
+import * as os from 'os';
+import * as fs from 'fs';
 import {
   isReady,
   shutdown,
@@ -42,48 +43,45 @@ console.log('SnarkyJS loaded');
 
 
 
-const SOCKET_PATH = '/tmp/mysocket.sock';
 
-// Server
+
+const SOCK_PATH = '/tmp/echo.sock';
+
 const server = net.createServer(socket => {
-  console.log('Server: Client connected');
+  console.log('Client connected');
 
   socket.on('data', data => {
-    console.log(`Server: Received message: ${data.toString()}`);
-    socket.write('Server: Message received');
+    console.log(`Received data: ${data}`);
+
+    // Echo back the received data
+    socket.write(data);
   });
 
   socket.on('close', () => {
-    console.log('Server: Client disconnected');
+    console.log('Client disconnected');
   });
 
   socket.on('error', error => {
-    console.log(`Server: Error: ${error}`);
+    console.error(`Socket error: ${error}`);
   });
 });
 
-server.listen(SOCKET_PATH, () => {
-  console.log(`Server: Listening on socket ${SOCKET_PATH}`);
+server.on('error', error => {
+  console.error(`Server error: ${error}`);
 });
 
-// Client
-const client = new net.Socket();
-
-client.connect(SOCKET_PATH, () => {
-  console.log('Client: Connected to server');
-  client.write('Client: Hello, server!');
+server.listen(SOCK_PATH, () => {
+  console.log(`Server listening on ${SOCK_PATH}`);
 });
 
-client.on('data', data => {
-  console.log(`Client: Received message: ${data.toString()}`);
-});
-
-client.on('close', () => {
-  console.log('Client: Disconnected from server');
-});
-
-client.on('error', error => {
-  console.log(`Client: Error: ${error}`);
+process.on('SIGINT', () => {
+  console.log('Cleaning up Unix domain socket...');
+  try {
+    fs.unlinkSync(SOCK_PATH);
+  } catch (error) {
+    console.error(`Error cleaning up Unix domain socket: ${error}`);
+  }
+  process.exit();
 });
 
 
