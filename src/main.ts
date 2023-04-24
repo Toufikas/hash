@@ -32,15 +32,6 @@ const Add = Experimental.ZkProgram({
         state.assertEquals(Field(0));
       },
     },
-
-    addNumber: {
-      privateInputs: [SelfProof, Field ],
-
-      method(newState: Field, earlierProof: SelfProof<Field>, numberToAdd: Field) {
-        earlierProof.verify();
-        newState.assertEquals(earlierProof.publicInput.add(numberToAdd));
-      },
-    },
   },
 });
 
