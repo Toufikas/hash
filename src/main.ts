@@ -44,67 +44,47 @@ console.log('SnarkyJS loaded');
 
 const SOCKET_PATH = '/tmp/mysocket.sock';
 
-async function startServer() {
-  console.log('Server: Initializing...');
+// Server
+const server = net.createServer(socket => {
+  console.log('Server: Client connected');
 
-  const server = net.createServer((socket) => {
-    console.log('Server: Client connected');
-
-    socket.on('data', (data) => {
-      console.log(`Server: Received message: ${data.toString()}`);
-      socket.write('Server: Message received');
-    });
-
-    socket.on('close', () => {
-      console.log('Server: Client disconnected');
-    });
-
-    socket.on('error', (error) => {
-      console.log(`Server: Error: ${error}`);
-    });
+  socket.on('data', data => {
+    console.log(`Server: Received message: ${data.toString()}`);
+    socket.write('Server: Message received');
   });
 
-  server.listen(SOCKET_PATH, () => {
-    console.log(`Server: Listening on socket ${SOCKET_PATH}`);
-    console.log('Server: Initialized');
+  socket.on('close', () => {
+    console.log('Server: Client disconnected');
   });
 
-  server.on('error', (error) => {
+  socket.on('error', error => {
     console.log(`Server: Error: ${error}`);
   });
-}
+});
 
-async function startClient() {
-  console.log('Client: Initializing...');
+server.listen(SOCKET_PATH, () => {
+  console.log(`Server: Listening on socket ${SOCKET_PATH}`);
+});
 
-  const client = net.createConnection(SOCKET_PATH);
+// Client
+const client = new net.Socket();
 
-  client.on('connect', () => {
-    console.log('Client: Connected to server');
-    client.write('Client: Hello, server!');
-  });
+client.connect(SOCKET_PATH, () => {
+  console.log('Client: Connected to server');
+  client.write('Client: Hello, server!');
+});
 
-  client.on('data', (data) => {
-    console.log(`Client: Received message: ${data.toString()}`);
-  });
+client.on('data', data => {
+  console.log(`Client: Received message: ${data.toString()}`);
+});
 
-  client.on('close', () => {
-    console.log('Client: Disconnected from server');
-  });
+client.on('close', () => {
+  console.log('Client: Disconnected from server');
+});
 
-  client.on('error', (error) => {
-    console.log(`Client: Error: ${error}`);
-  });
-
-  console.log('Client: Initialized');
-}
-
-async function main() {
-  await startServer();
-  await startClient();
-}
-
-main();
+client.on('error', error => {
+  console.log(`Client: Error: ${error}`);
+});
 
 
 
