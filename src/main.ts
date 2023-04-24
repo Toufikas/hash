@@ -1,5 +1,5 @@
 import { IncrementSecret } from './IncrementSecret.js';
-
+import fs from 'fs';
 import net from 'net';
 import { AddressInfo } from 'net';
 
@@ -53,37 +53,44 @@ console.log('SnarkyJS loaded');
 //  const proof0 = await Add.init(Field(0));
 
 
-
-
-
-
 const server = net.createServer((socket) => {
-  console.log('Client connected');
+  console.log('Server: client connected');
+  socket.write('Hello from server!');
 
   socket.on('data', (data) => {
-    console.log(`Received data: ${data.toString()}`);
-
-    // Echo the received data back to the client
-    socket.write(`Echo: ${data.toString()}\n`);
+    console.log(`Server: received data: ${data}`);
+    socket.write(`Server: received ${data.length} bytes`);
   });
 
-  socket.on('close', () => {
-    console.log('Client disconnected');
-  });
-
-  socket.on('error', (err) => {
-    console.error(`Socket error: ${err}`);
+  socket.on('end', () => {
+    console.log('Server: client disconnected');
   });
 });
 
-// Bind the server to a Unix domain socket
-const socketPath = '/tmp/mysocket.sock';
-server.listen(socketPath, () => {
-  const { address, port } = server.address() as AddressInfo;
-  console.log(`Server listening on ${address}:${port}`);
-});
+const SOCK_PATH = './test.sock';
 
-   
+if (fs.existsSync(SOCK_PATH)) {
+  fs.unlinkSync(SOCK_PATH);
+}
+
+server.listen(SOCK_PATH, () => {
+  console.log('Server listening on ' + SOCK_PATH);
+  
+  // Connect to the server via the same socket
+  const client = net.connect(SOCK_PATH, () => {
+    console.log('Client: connected to server');
+    client.write('Hello from client!');
+  });
+
+  client.on('data', (data) => {
+    console.log(`Client: received data: ${data}`);
+    client.end();
+  });
+
+  client.on('end', () => {
+    console.log('Client: disconnected from server');
+  });
+});
 
 
 
