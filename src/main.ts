@@ -1,5 +1,7 @@
 import { IncrementSecret } from './IncrementSecret.js';
 import net from 'net';
+import fs from 'fs';
+
 import {
   isReady,
   shutdown,
@@ -52,22 +54,39 @@ console.log('SnarkyJS loaded');
 
 
 
+
+const readSemaphore = new fs.promises.Semaphore('/path/to/semaphore-for-read');
+const writeSemaphore = new fs.promises.Semaphore('/path/to/semaphore-for-write');
+const inputMemoryFile = '/path/to/input/memory/file';
+const outputMemoryFile = '/path/to/output/memory/file';
+
 const client = new net.Socket();
 
 // Connect to the Go app's TCP server
-client.connect(8000, '127.0.0.1', () => {
+client.connect(8000, '127.0.0.1', async () => {
     console.log('Connected to Go app');
 
-    // Wait for the Go app to finish writing
-    client.on('data', (data: Buffer) => {
-        console.log('Received data from Go app:', data.toString());
+    while (true) {
+        // Wait for the Go app to notify us that it has finished writing
+        await readSemaphore.wait();
 
-        // Signal the Go app that we're done reading
-        client.write('Done reading');
+        // Read the data from the memory file
+        const inputData = fs.readFileSync(inputMemoryFile);
 
-        client.destroy();
-    });
+        console.log('Received data from Go app:', inputData.toString());
+
+        // Process the data and generate a response
+        const outputData = Buffer.from('Response data');
+
+        // Write the response to the memory file
+        fs.writeFileSync(outputMemoryFile, outputData);
+
+        // Notify the Go app that we're done writing
+        await writeSemaphore.post();
+    }
 });
+
+
 
 
 
