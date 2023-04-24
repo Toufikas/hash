@@ -1,6 +1,6 @@
 import { IncrementSecret } from './IncrementSecret.js';
-import * as net from 'net';
-import * as fs from 'fs';
+import net from 'net'
+import fs from 'fs'
 
 
 import {
@@ -44,26 +44,34 @@ console.log('SnarkyJS loaded');
 
 
 
-
+const SOCKET_PATH = '/tmp/echo.sock'
 
 const server = net.createServer((socket) => {
-  console.log('Client connected');
-  socket.on('data', (data) => {
-    console.log(`Received: ${data}`);
-    socket.write(`Echo: ${data}`);
-  });
-  socket.on('end', () => {
-    console.log('Client disconnected');
-  });
-});
+  console.log('Client connected')
 
-const SOCK_PATH = '/tmp/echo.sock';
-if (fs.existsSync(SOCK_PATH)) {
-  fs.unlinkSync(SOCK_PATH);
-}
-server.listen(SOCK_PATH, () => {
-  console.log(`Server started on ${SOCK_PATH}`);
-});
+  // Handle incoming data from the client
+  socket.on('data', (data) => {
+    console.log(`Received data: ${data}`)
+    const message = data.toString() // convert the data to string
+    socket.write(message)
+  })
+
+  // Handle socket closing
+  socket.on('close', () => {
+    console.log('Client disconnected')
+  })
+})
+
+// Cleanup the socket file
+fs.unlinkSync(SOCKET_PATH)
+
+// Start the server listening on the socket path
+server.listen(SOCKET_PATH, () => {
+  console.log(`Server listening on ${SOCKET_PATH}`)
+})
+
+
+
 
 
   console.log('compiling...');
