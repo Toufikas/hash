@@ -1,7 +1,7 @@
 import { IncrementSecret } from './IncrementSecret.js';
 import * as net from 'net';
-import * as os from 'os';
 import * as fs from 'fs';
+
 import {
   isReady,
   shutdown,
@@ -44,45 +44,50 @@ console.log('SnarkyJS loaded');
 
 
 
+const SOCKET_FILE = '/tmp/my_unix_socket.sock';
 
-const SOCK_PATH = '/tmp/echo.sock';
+const server = net.createServer((socket) => {
+  console.log('Client connected.');
 
-const server = net.createServer(socket => {
-  console.log('Client connected');
+  socket.on('data', (data) => {
+    console.log(`Received data: ${data.toString()}`);
 
-  socket.on('data', data => {
-    console.log(`Received data: ${data}`);
-
-    // Echo back the received data
+    // Echo the received data back to the client.
     socket.write(data);
   });
 
   socket.on('close', () => {
-    console.log('Client disconnected');
-  });
-
-  socket.on('error', error => {
-    console.error(`Socket error: ${error}`);
+    console.log('Client disconnected.');
   });
 });
 
-server.on('error', error => {
-  console.error(`Server error: ${error}`);
+// Delete the Unix domain socket file if it already exists.
+if (fs.existsSync(SOCKET_FILE)) {
+  fs.unlinkSync(SOCKET_FILE);
+}
+
+// Listen for incoming connections on the Unix domain socket.
+server.listen(SOCKET_FILE, () => {
+  console.log(`Server listening on ${SOCKET_FILE}`);
 });
 
-server.listen(SOCK_PATH, () => {
-  console.log(`Server listening on ${SOCK_PATH}`);
+// Handle server errors.
+server.on('error', (err) => {
+  console.error(`Server error: ${err}`);
 });
 
+// Handle server shutdown.
 process.on('SIGINT', () => {
-  console.log('Cleaning up Unix domain socket...');
-  try {
-    fs.unlinkSync(SOCK_PATH);
-  } catch (error) {
-    console.error(`Error cleaning up Unix domain socket: ${error}`);
-  }
-  process.exit();
+  console.log('Shutting down server.');
+
+  server.close(() => {
+    console.log('Server stopped.');
+
+    // Delete the Unix domain socket file.
+    fs.unlinkSync(SOCKET_FILE);
+  });
 });
+
 
 
 
