@@ -49,11 +49,11 @@ console.log('SnarkyJS loaded');
 const SOCKET_PATH = '/tmp/mysocket.sock';
 
 async function startServer() {
-console.log('server init');
+  console.log('server init');
 
   const server = net.createServer(async (socket) => {
     console.log('Server: Client connected');
-console.log('server tried to connect');
+    console.log('server tried to connect');
 
     socket.on('data', (data) => {
       console.log(`Server: Received message: ${data.toString()}`);
@@ -73,8 +73,7 @@ console.log('server tried to connect');
     console.log(`Server: Listening on socket ${SOCKET_PATH}`);
   });
 
-console.log('server set listener');
-
+  console.log('server set listener');
 
   server.on('error', (error) => {
     console.log(`Server: Error: ${error}`);
@@ -82,19 +81,22 @@ console.log('server set listener');
 }
 
 async function startClient() {
-
-console.log('client init');
+  console.log('client init');
 
   const client = createConnection(SOCKET_PATH);
   client.on('connect', () => {
     console.log('Client: Connected to server');
+    client.write('Client: Hello, server!');
+    console.log('client wrote');
   });
-console.log('client tried connected');
+
+  console.log('client tried connected');
 
   client.on('data', (data) => {
     console.log(`Client: Received message: ${data.toString()}`);
   });
-console.log('client set listener');
+
+  console.log('client set listener');
 
   client.on('close', () => {
     console.log('Client: Disconnected from server');
@@ -103,23 +105,10 @@ console.log('client set listener');
   client.on('error', (error) => {
     console.log(`Client: Error: ${error}`);
   });
-
-  client.write('Client: Hello, server!');
-console.log('client wrote');
-
 }
 
-
-  // Remove the socket file if it exists
-  try {
-    await fs.unlink(SOCKET_PATH);
-  } catch (error) {}
-console.log('main');
-  // Start the server and the client
-  await Promise.all([startServer(), startClient()]);
-
-
-
+await startServer();
+await startClient();
 
 
 
