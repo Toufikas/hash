@@ -42,46 +42,45 @@ const Add = Experimental.ZkProgram({
 console.log('SnarkyJS loaded');
 
 
-const SOCKET_FILE = '/tmp/mysocket.sock';
 
-// Server
-const server = net.createServer((socket: Socket) => {
-  console.log('Client connected.');
+const socketPath = '/tmp/test.sock';
+
+const server = net.createServer((socket) => {
+  console.log('Server: client connected');
 
   socket.on('data', (data) => {
-    console.log(`Received data from client: ${data.toString()}`);
-    socket.write(`Received your message: ${data.toString()}`);
+    console.log('Server: received data:', data.toString());
+
+    // Write back to the client
+    socket.write(`Server received data: ${data.toString()}`);
   });
 
   socket.on('end', () => {
-    console.log('Client disconnected.');
+    console.log('Server: client disconnected');
   });
 });
 
-server.on('error', (err) => {
-  console.error(`Server error: ${err}`);
+server.listen(socketPath, () => {
+  console.log('Server: listening on', socketPath);
+
+  // Create a client connection to the server
+  const client = net.createConnection(socketPath, () => {
+    console.log('Client: connected to server');
+
+    // Send a message to the server
+    client.write('Hello, server!');
+  });
+
+  client.on('data', (data) => {
+    console.log('Client: received data:', data.toString());
+  });
+
+  client.on('end', () => {
+    console.log('Client: disconnected from server');
+  });
 });
 
-server.listen(SOCKET_FILE, () => {
-  console.log(`Server listening on socket file: ${SOCKET_FILE}`);
-});
 
-// Client
-const client = new net.Socket();
-
-client.connect(SOCKET_FILE, () => {
-  console.log('Connected to server.');
-  client.write('Hello, server!');
-});
-
-client.on('data', (data) => {
-  console.log(`Received data from server: ${data.toString()}`);
-  client.destroy(); // close the client socket
-});
-
-client.on('close', () => {
-  console.log('Connection closed.');
-});
 
 
 
