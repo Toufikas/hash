@@ -1,6 +1,7 @@
 import { IncrementSecret } from './IncrementSecret.js';
-import * as net from 'net';
-import * as fs from 'fs';
+import net from 'net';
+import fs from 'fs';
+
 
 import {
   isReady,
@@ -42,45 +43,51 @@ console.log('SnarkyJS loaded');
 
 
 
+const SOCKET_PATH = '/tmp/mysocket';
 
-const SOCKET_FILE = '/tmp/my-socket.sock';
-
-// Create a Unix domain socket server
 const server = net.createServer((socket) => {
-  console.log('Client connected');
-
-  // When the server receives data from the client, log it and send a response
+  console.log('Server: Client connected');
   socket.on('data', (data) => {
-    console.log('Received data from client:', data.toString());
-    socket.write(Buffer.from('Response from server'));
+    console.log(`Server: Received data: ${data.toString()}`);
+    socket.write(`Server: Received ${data.length} bytes`);
   });
-
-  // When the client disconnects, log it
   socket.on('end', () => {
-    console.log('Client disconnected');
+    console.log('Server: Client disconnected');
   });
 });
 
-// Listen for connections on the Unix domain socket
-server.listen(SOCKET_FILE, () => {
-  console.log('Server listening on', SOCKET_FILE);
-
-  // Connect to the Unix domain socket as a client
-  const client = net.createConnection(SOCKET_FILE, () => {
-    console.log('Connected to server');
-
-    // Send a message to the server
-    client.write(Buffer.from('Hello from client'));
-  });
-
-  // When the client receives data from the server, log it
-  client.on('data', (data) => {
-    console.log('Received data from server:', data.toString());
-
-    // Disconnect from the server
-    client.end();
-  });
+server.on('error', (err) => {
+  console.error(`Server: Error: ${err}`);
 });
+
+server.listen(SOCKET_PATH, () => {
+  console.log(`Server: Listening on ${SOCKET_PATH}`);
+});
+
+const client = new net.Socket();
+
+client.on('connect', () => {
+  console.log('Client: Connected');
+  client.write('Hello, server!');
+});
+
+client.on('data', (data) => {
+  console.log(`Client: Received data: ${data.toString()}`);
+  client.end();
+});
+
+client.on('end', () => {
+  console.log('Client: Disconnected');
+});
+
+client.on('error', (err) => {
+  console.error(`Client: Error: ${err}`);
+});
+
+client.connect(SOCKET_PATH, () => {
+  console.log(`Client: Connected to server at ${SOCKET_PATH}`);
+});
+
 
 
 
