@@ -140,7 +140,7 @@ map.set(value, key);
 const rt = map.getRoot().toJSON();
 const wt = map.getWitness(key).toJSON();
 
-console.log(rt, wt);
+//console.log(rt, wt);
 
 const useProof = false;
 
