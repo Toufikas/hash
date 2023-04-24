@@ -17,6 +17,7 @@ import {
   MerkleWitness,
   MerkleMapWitness,
   verify,
+  net,
 } from 'snarkyjs';
 
 await isReady;
@@ -37,19 +38,40 @@ const Add = Experimental.ZkProgram({
 
 console.log('SnarkyJS loaded');
 
+
+
+
   console.log('compiling...');
 
-  const { verificationKey } = await Add.compile();
+//  const { verificationKey } = await Add.compile();
 
   console.log('making proof 0')
 
-  const proof0 = await Add.init(Field(0));
+//  const proof0 = await Add.init(Field(0));
 
 
 
 
+const client = new net.Socket();
 
-  console.log('proof 2 data', proof0.publicInput.toString());
+// Connect to the Go app's TCP server
+client.connect(8000, '127.0.0.1', () => {
+    console.log('Connected to Go app');
+
+    // Wait for the Go app to finish writing
+    client.on('data', (data: Buffer) => {
+        console.log('Received data from Go app:', data.toString());
+
+        // Signal the Go app that we're done reading
+        client.write('Done reading');
+
+        client.destroy();
+    });
+});
+
+
+
+//  console.log('proof 2 data', proof0.publicInput.toString());
 
 
 
