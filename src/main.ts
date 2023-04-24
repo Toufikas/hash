@@ -52,7 +52,7 @@ const server = net.createServer((socket) => {
   // When the server receives data from the client, log it and send a response
   socket.on('data', (data) => {
     console.log('Received data from client:', data.toString());
-    socket.write('Response from server');
+    socket.write(Buffer.from('Response from server'));
   });
 
   // When the client disconnects, log it
@@ -70,7 +70,7 @@ server.listen(SOCKET_FILE, () => {
     console.log('Connected to server');
 
     // Send a message to the server
-    client.write('Hello from client');
+    client.write(Buffer.from('Hello from client'));
   });
 
   // When the client receives data from the server, log it
