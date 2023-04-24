@@ -51,7 +51,7 @@ console.log('SnarkyJS loaded');
 
 
   console.log('verifying proof 2');
-  console.log('proof 2 data', proof2.publicInput.toString());
+  console.log('proof 2 data', proof0.publicInput.toString());
 
   console.log('ok', ok);
 
