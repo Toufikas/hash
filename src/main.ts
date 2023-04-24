@@ -45,15 +45,12 @@ console.log('SnarkyJS loaded');
 
   const proof0 = await Add.init(Field(0));
 
-  console.log('making proof 1')
 
 
 
 
-  console.log('verifying proof 2');
   console.log('proof 2 data', proof0.publicInput.toString());
 
-  console.log('ok', ok);
 
 
 const map = new MerkleMap();
