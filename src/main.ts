@@ -12,6 +12,16 @@ await isReady;
 
 console.log('SnarkyJS loaded');
 
+const map = new MerkleMap();
+const key = Field(30);
+const value = Field(120);
+map.set(key, value);
+map.set(value, key);
+const rt = map.getRoot();
+const wt = map.getWitness(key);
+
+console.log(rt, wt);
+
 const useProof = false;
 
 const Local = Mina.LocalBlockchain({ proofsEnabled: useProof });
