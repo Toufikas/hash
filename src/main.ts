@@ -1,5 +1,5 @@
 import { IncrementSecret } from './IncrementSecret.js';
-import net, { createConnection } from 'net';
+import net from 'net'
 
 import {
   isReady,
@@ -42,76 +42,65 @@ console.log('SnarkyJS loaded');
 
 
 
-
-const SOCKET_PATH = '/tmp/mysocket.sock';
+const SOCKET_PATH = '/tmp/mysocket.sock'
 
 async function startServer() {
-  console.log('server init');
-  const server = net.createServer((socket) => {
-    console.log('Server: Client connected');
-    console.log('server tried to connect');
+  console.log('Server: Initializing...')
+
+  const server = net.createServer(async (socket) => {
+    console.log('Server: Client connected')
 
     socket.on('data', (data) => {
-      console.log(`Server: Received message: ${data.toString()}`);
-      socket.write('Server: Message received');
-    });
+      console.log(`Server: Received message: ${data.toString()}`)
+      socket.write('Server: Message received')
+    })
 
     socket.on('close', () => {
-      console.log('Server: Client disconnected');
-    });
+      console.log('Server: Client disconnected')
+    })
 
     socket.on('error', (error) => {
-      console.log(`Server: Error: ${error}`);
-    });
-  });
+      console.log(`Server: Error: ${error}`)
+    })
+  })
 
   server.listen(SOCKET_PATH, () => {
-    console.log(`Server: Listening on socket ${SOCKET_PATH}`);
-  });
+    console.log(`Server: Listening on socket ${SOCKET_PATH}`)
+  })
 
-  console.log('server set listener');
-
-  server.on('error', (error) => {
-    console.log(`Server: Error: ${error}`);
-  });
-
-  await new Promise((resolve) => server.on('listening', resolve));
+  console.log('Server: Initialized')
 }
 
 async function startClient() {
-  console.log('client init');
-  const client = createConnection(SOCKET_PATH);
+  console.log('Client: Initializing...')
 
-  await new Promise((resolve) => client.on('connect', resolve));
-  console.log('Client: Connected to server');
-  console.log('client tried connected');
+  const client = net.createConnection(SOCKET_PATH)
+  client.on('connect', () => {
+    console.log('Client: Connected to server')
+    client.write('Client: Hello, server!')
+  })
 
   client.on('data', (data) => {
-    console.log(`Client: Received message: ${data.toString()}`);
-  });
-  console.log('client set listener');
+    console.log(`Client: Received message: ${data.toString()}`)
+  })
 
   client.on('close', () => {
-    console.log('Client: Disconnected from server');
-  });
+    console.log('Client: Disconnected from server')
+  })
 
   client.on('error', (error) => {
-    console.log(`Client: Error: ${error}`);
-  });
+    console.log(`Client: Error: ${error}`)
+  })
 
-  client.write('Client: Hello, server!');
-  console.log('client wrote');
-
-  await new Promise((resolve) => setTimeout(resolve, 1000));
-  client.end();
+  console.log('Client: Initialized')
 }
 
 async function main() {
-  await startServer();
-  await startClient();
+  await startServer()
+  await startClient()
 }
 
-main().catch(console.error);
+main()
 
 
 
