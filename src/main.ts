@@ -1,7 +1,6 @@
 import { IncrementSecret } from './IncrementSecret.js';
 import * as net from 'net';
-import * as fs from 'fs';
-
+import * as readline from 'readline';
 
 import {
   isReady,
@@ -45,30 +44,32 @@ console.log('SnarkyJS loaded');
 
 
 
-const SOCKET_PATH = '/tmp/echo.sock';
-const MESSAGE = "I'm a Kungfu Dev";
+const client = net.createConnection('/tmp/echo.sock');
 
-// Connect to the server via the Unix domain socket
-const socket = net.createConnection(SOCKET_PATH);
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
-// Send the message to the server
-socket.write(MESSAGE);
+client.on('connect', () => {
+  rl.question('Enter message to echo: ', (message) => {
+    client.write(`${message}\n`);
+  });
+});
 
-// Listen for data from the server and log it to the console
-socket.on('data', (data) => {
+client.on('data', (data) => {
   console.log(data.toString());
+  client.end();
 });
 
-// Handle errors
-socket.on('error', (error) => {
-  console.error(error);
+client.on('end', () => {
+  process.exit(0);
 });
 
-// Cleanup the socket file on exit
-process.on('exit', () => {
-  fs.unlinkSync(SOCKET_PATH);
+client.on('error', (err) => {
+  console.error(err);
+  process.exit(1);
 });
-
 
 
 
