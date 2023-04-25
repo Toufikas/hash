@@ -8,7 +8,7 @@ import (
 )
 func main() {
     // Create a Unix domain socket and listen for incoming connections.
-    socket, err := net.Listen("unix", "/tmp/echo.sock")
+    conn, err := net.Dial("unix", "/tmp/echo.sock")
     if err != nil {
         log.Fatal(err)
     }
@@ -24,7 +24,7 @@ func main() {
 **/
     for {
         // Accept an incoming connection.
-        conn, err := socket.Dial()
+        //conn, err := socket.Dial()
         if err != nil {
             log.Fatal(err)
         }
