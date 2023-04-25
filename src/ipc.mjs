@@ -22,7 +22,7 @@ let server, client, mode;
 var SHUTDOWN = false;
 
 // Our socket
-const SOCKETFILE = '/tmp/unix.sock';
+const SOCKETFILE = '/tmp/echo.sock';
 
 // For simplicity of demonstration, both ends in this one file
 switch(process.env["MODE"] || process.env["mode"]){
