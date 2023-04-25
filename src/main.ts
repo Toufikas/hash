@@ -1,4 +1,5 @@
 import { IncrementSecret } from './IncrementSecret.js';
+
 import net from 'net';
 
 
@@ -43,7 +44,7 @@ console.log('SnarkyJS loaded');
 
 
 
-function zkcode() {
+export function zkcode() {
 
 console.log("Connecting to server.");
 
