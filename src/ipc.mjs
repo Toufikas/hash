@@ -15,7 +15,7 @@ const connections = {};
 let server, client, mode;
 
 
- zkcode()
+ 
 
 
 // prevent duplicate exit messages
@@ -176,5 +176,7 @@ if(mode === "client"){
         }
     }
     process.on('SIGINT', cleanup);
+
+    zkcode()
 }
 
