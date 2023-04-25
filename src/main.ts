@@ -46,11 +46,11 @@ const Add = Experimental.ZkProgram({
 console.log('SnarkyJS loaded');
 
 
-jcode()
+export function jscode() {
 
-console.log("Connecting to server.");
+console.log("Connecting to zk server.");
 
-
+}
 
 
 
