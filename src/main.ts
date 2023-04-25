@@ -44,13 +44,15 @@ console.log('SnarkyJS loaded');
 
 
 
+const SOCKETFILE = '/tmp/echo.sock';
 
-const client = net.createConnection('/tmp/echo.sock', () => {
+const client = net.createConnection(SOCKETFILE, () => {
   console.log('Connected to server');
+  client.write("I'm a TypeScript developer!");
 });
 
 client.on('data', (data) => {
-  console.log(data.toString());
+  console.log(`Server response: ${data.toString()}`);
   client.end();
 });
 
@@ -58,7 +60,11 @@ client.on('end', () => {
   console.log('Disconnected from server');
 });
 
-client.write("I'm a Kungfu Dev\n");
+client.on('error', (error) => {
+  console.error(`Error: ${error}`);
+});
+
+
 
 
 
