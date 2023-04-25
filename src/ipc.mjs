@@ -7,7 +7,7 @@
 **   client>  MODE=client node ipc.example.js
 **
 */
-import { zkcode } from "./index.js";
+//import { zkcode } from "./index.js";
 import net from 'net';
 import fs from 'fs';
 
