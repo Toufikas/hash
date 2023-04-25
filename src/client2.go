@@ -36,16 +36,16 @@ func main() {
             buf := make([]byte, 4096)
 
             // Read data from the connection.
-            _, err := conn.Read(buf)
+            n, err := conn.Read(buf)
             if err != nil {
                 log.Fatal(err)
             }
     
-            bufdt = []byte("foo\n")
-            copy(buf, bufdt)
+           // bufdt = []byte("foo\n")
+           // copy(buf, bufdt)
 
             // Echo the data back to the connection.
-            n, err = conn.Write(buf[:n])
+            _, err = conn.Write(buf[:n])
             if err != nil {
                 log.Fatal(err)
             }
