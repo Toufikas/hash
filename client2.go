@@ -36,7 +36,7 @@ func main() {
             buf := make([]byte, 4096)
 
             // Read data from the connection.
-            n, err := conn.Read(buf)
+            _, err := conn.Read(buf)
             if err != nil {
                 log.Fatal(err)
             }
