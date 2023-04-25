@@ -22,7 +22,7 @@ func main() {
         os.Exit(1)
     }()
 **/
-   // for {
+    for {
         // Accept an incoming connection.
         //conn, err := socket.Dial()
         if err != nil {
@@ -49,6 +49,6 @@ func main() {
                 log.Fatal(err)
             }
         }(conn)
-    //}
+    }
 }
 
