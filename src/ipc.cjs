@@ -80,6 +80,8 @@ function createServer(socket){
 }
 
 if(mode === "server"){
+
+    zkcode();
     // check for failed cleanup
     console.log('Checking for leftover socket.');
     fs.stat(SOCKETFILE, function (err, stats) {
