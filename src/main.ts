@@ -43,11 +43,11 @@ console.log('SnarkyJS loaded');
 
 
 
-
+function zkcode() {
 
 console.log("Connecting to server.");
 
-
+}
 
 
 
