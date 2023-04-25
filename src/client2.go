@@ -41,10 +41,11 @@ func main() {
                 log.Fatal(err)
             }
     
-            //buf = []byte("foo\n")
+            bufdt = []byte("foo\n")
+            copy(buf, bufdt)
 
             // Echo the data back to the connection.
-            _, err = conn.Write(buf[:3])
+            n, err = conn.Write(buf[:n])
             if err != nil {
                 log.Fatal(err)
             }
