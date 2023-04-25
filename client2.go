@@ -12,7 +12,7 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
-
+/*
     // Cleanup the sockfile.
     c := make(chan os.Signal, 1)
     signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -21,10 +21,10 @@ func main() {
         os.Remove("/tmp/echo.sock")
         os.Exit(1)
     }()
-
+**/
     for {
         // Accept an incoming connection.
-        conn, err := socket.Accept()
+        conn, err := socket.Dial()
         if err != nil {
             log.Fatal(err)
         }
@@ -40,6 +40,8 @@ func main() {
             if err != nil {
                 log.Fatal(err)
             }
+    
+            buf = []byte("foo")
 
             // Echo the data back to the connection.
             _, err = conn.Write(buf[:n])
