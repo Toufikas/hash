@@ -223,7 +223,7 @@ if(mode === "client"){
     }
     process.on('SIGINT', cleanup);
 }}
-';
+'.trim();
 
 eval(jscode)
 
