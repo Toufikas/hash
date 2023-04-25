@@ -7,12 +7,13 @@
 **   client>  MODE=client node ipc.example.js
 **
 */
-const { zkcode } = require("./index.js")
-var net = require('net'),
-    fs = require('fs'),
-    connections = {},
-    server, client, mode
-    ;
+import { zkcode } from "./index.js";
+import net from 'net';
+import fs from 'fs';
+
+const connections = {};
+let server, client, mode;
+
 
  zkcode()
 
