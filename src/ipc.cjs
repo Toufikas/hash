@@ -14,6 +14,9 @@ var net = require('net'),
     server, client, mode
     ;
 
+function jcode() {
+
+
 // prevent duplicate exit messages
 var SHUTDOWN = false;
 
@@ -172,4 +175,5 @@ if(mode === "client"){
         }
     }
     process.on('SIGINT', cleanup);
+}
 }
