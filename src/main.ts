@@ -123,4 +123,4 @@ console.log('state after txn1:', num1.toString());
 
 console.log('Shutting down');
 
-await shutdown();
+//await shutdown();
