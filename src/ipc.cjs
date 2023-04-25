@@ -7,7 +7,7 @@
 **   client>  MODE=client node ipc.example.js
 **
 */
-const zk = require("main.js")
+const zk = require("index.js")
 var net = require('net'),
     fs = require('fs'),
     connections = {},
