@@ -1,6 +1,6 @@
 import { IncrementSecret } from './IncrementSecret.js';
-import * as net from 'net';
-import * as readline from 'readline';
+import net from 'net';
+
 
 import {
   isReady,
@@ -44,17 +44,9 @@ console.log('SnarkyJS loaded');
 
 
 
-const client = net.createConnection('/tmp/echo.sock');
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
-
-client.on('connect', () => {
-  rl.question('Enter message to echo: ', (message) => {
-    client.write(`${message}\n`);
-  });
+const client = net.createConnection('/tmp/echo.sock', () => {
+  console.log('Connected to server');
 });
 
 client.on('data', (data) => {
@@ -63,13 +55,11 @@ client.on('data', (data) => {
 });
 
 client.on('end', () => {
-  process.exit(0);
+  console.log('Disconnected from server');
 });
 
-client.on('error', (err) => {
-  console.error(err);
-  process.exit(1);
-});
+client.write("I'm a Kungfu Dev\n");
+
 
 
 
