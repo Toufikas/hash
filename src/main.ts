@@ -44,25 +44,60 @@ console.log('SnarkyJS loaded');
 
 
 
-const SOCKETFILE = '/tmp/echo.sock';
 
-const client = net.createConnection(SOCKETFILE, () => {
-  console.log('Connected to server');
-  client.write("I'm a TypeScript developer!");
+console.log("Connecting to server.");
+
+let client: net.Socket;
+const SOCKETFILE = '/tmp/echo.sock'; // specify your socket file here
+
+client = net.createConnection(SOCKETFILE)
+    .on('connect', ()=>{
+        console.log("Connected.");
+    })
+    // Messages are buffers. use toString
+    .on('data', function(data: Buffer) {
+        data = data.toString();
+
+        if(data === '__boop'){
+            console.info('Server sent boop. Confirming our snoot is booped.');
+            client.write('__snootbooped');
+            return;
+        }
+        if(data === '__disconnect'){
+            console.log('Server disconnected.');
+            return cleanup();
+        }
+
+        // Generic message handler
+        console.info('Server:', data);
+    })
+    .on('error', function() {
+        console.error('Server not active.');
+        process.exit(1);
+    });
+
+// Handle input from stdin.
+let inputbuffer = "";
+process.stdin.on("data", function (data: Buffer) {
+    inputbuffer += data.toString();
+    if (inputbuffer.indexOf("\n") !== -1) {
+        const line = inputbuffer.substring(0, inputbuffer.indexOf("\n"));
+        inputbuffer = inputbuffer.substring(inputbuffer.indexOf("\n") + 1);
+        // Let the client escape
+        if(line === 'exit'){ return cleanup(); }
+        if(line === 'quit'){ return cleanup(); }
+        client.write(line);
+    }
 });
 
-client.on('data', (data) => {
-  console.log(`Server response: ${data.toString()}`);
-  client.end();
-});
-
-client.on('end', () => {
-  console.log('Disconnected from server');
-});
-
-client.on('error', (error) => {
-  console.error(`Error: ${error}`);
-});
+function cleanup(){
+    if(!SHUTDOWN){ SHUTDOWN = true;
+        console.log('\n',"Terminating.",'\n');
+        client.end();
+        process.exit(0);
+    }
+}
+process.on('SIGINT', cleanup);
 
 
 
