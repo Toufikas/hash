@@ -1,6 +1,11 @@
 package main
-import (...)
-
+import (
+    "log"
+    "net"
+    "os"
+    "os/signal"
+    "syscall"
+)
 func main() {
     // Create a Unix domain socket and listen for incoming connections.
     socket, err := net.Listen("unix", "/tmp/echo.sock")
