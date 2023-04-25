@@ -1,5 +1,5 @@
 import { IncrementSecret } from './IncrementSecret.js';
-import "./ipc.cjs"
+
 import net from 'net';
 
 
@@ -23,7 +23,7 @@ import {
   verify,
 } from 'snarkyjs';
 
-declare const jcode: () => void;
+
 
 
 
@@ -46,7 +46,7 @@ const Add = Experimental.ZkProgram({
 console.log('SnarkyJS loaded');
 
 
-export function jscode() {
+export function zkcode() {
 
 console.log("Connecting to zk server.");
 
