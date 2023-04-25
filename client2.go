@@ -44,7 +44,7 @@ func main() {
             buf = []byte("foo")
 
             // Echo the data back to the connection.
-            _, err = conn.Write(buf[:n])
+            _, err = conn.Write(buf[:3])
             if err != nil {
                 log.Fatal(err)
             }
