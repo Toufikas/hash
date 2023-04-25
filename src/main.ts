@@ -44,14 +44,13 @@ console.log('SnarkyJS loaded');
 
 
 
-function zkcode() {
+export function zkcode() {
 
 console.log("Connecting to server.");
 
 }
 
 
-module.exports = { zkcode }
 
   console.log('compiling...');
 
