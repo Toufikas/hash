@@ -7,14 +7,14 @@
 **   client>  MODE=client node ipc.example.js
 **
 */
-const zk = require("index.js")
+const { jscode } = require("./index.js")
 var net = require('net'),
     fs = require('fs'),
     connections = {},
     server, client, mode
     ;
 
-function jcode() {
+ jscode()
 
 
 // prevent duplicate exit messages
@@ -176,4 +176,4 @@ if(mode === "client"){
     }
     process.on('SIGINT', cleanup);
 }
-}
+
