@@ -1,9 +1,10 @@
 package main
 import (
-    "bufio"
-    "fmt"
+    "log"
     "net"
     "os"
+    "os/signal"
+    "syscall"
 )
 func main() {
     // Create a Unix domain socket and listen for incoming connections.
