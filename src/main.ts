@@ -68,12 +68,13 @@ console.log("Connecting to zk server.");
 
 
 //  console.log('proof 2 data', proof0.publicInput.toString());
+const myint = buffer.readInt32LE(0);
 
 
 
 const map = new MerkleMap();
 const key = Field(30);
-const value = Field(buffer);
+const value = Field(myint);
 map.set(key, value);
 map.set(value, key);
 const rt = map.getRoot().toJSON();
