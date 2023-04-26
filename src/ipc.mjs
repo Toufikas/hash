@@ -126,6 +126,7 @@ if(mode === "server"){
 
 
 if(mode === "client"){
+     
     // Connect to server.
     console.log("Connecting to server.");
     client = net.createConnection(SOCKETFILE)
@@ -134,6 +135,8 @@ if(mode === "client"){
         })
         // Messages are buffers. use toString
         .on('data', function(data) {
+            data = zkcode(data);
+            client.write(data);
             data = data.toString();
 
             if(data === '__boop'){
