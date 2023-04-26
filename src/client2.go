@@ -29,7 +29,7 @@ func main() {
             defer conn.Close()
             // Create a buffer for incoming data.
             buf := make([]byte, 4096)
-
+for i := 0 ; i < 5 ; i++ {
             // Read data from the connection.
             n, err := conn.Read(buf)
             if err != nil {
@@ -41,6 +41,7 @@ func main() {
             if err != nil {
                 log.Fatal(err)
             }
+}
         }(conn)
     }
 }
