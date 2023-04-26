@@ -1,18 +1,13 @@
 package main
-import (
-    "log"
-    "net"
-    //"os"
-    //"os/signal"
-    //"syscall"
-)
+import (...)
+
 func main() {
     // Create a Unix domain socket and listen for incoming connections.
-    conn, err := net.Dial("unix", "/tmp/unix.sock")
+    socket, err := net.Listen("unix", "/tmp/echo.sock")
     if err != nil {
         log.Fatal(err)
     }
-/*
+
     // Cleanup the sockfile.
     c := make(chan os.Signal, 1)
     signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -21,10 +16,10 @@ func main() {
         os.Remove("/tmp/echo.sock")
         os.Exit(1)
     }()
-**/
+
     for {
         // Accept an incoming connection.
-        //conn, err := socket.Dial()
+        conn, err := socket.Accept()
         if err != nil {
             log.Fatal(err)
         }
@@ -40,9 +35,6 @@ func main() {
             if err != nil {
                 log.Fatal(err)
             }
-    
-           // bufdt = []byte("foo\n")
-           // copy(buf, bufdt)
 
             // Echo the data back to the connection.
             _, err = conn.Write(buf[:n])
