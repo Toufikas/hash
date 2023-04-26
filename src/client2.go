@@ -1,6 +1,10 @@
 package main
-import (...)
-
+import (
+    "bufio"
+    "fmt"
+    "net"
+    "os"
+)
 func main() {
     // Create a Unix domain socket and listen for incoming connections.
     socket, err := net.Listen("unix", "/tmp/echo.sock")
