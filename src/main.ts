@@ -1,6 +1,7 @@
 import { IncrementSecret } from './IncrementSecret.js';
 
 import net from 'net';
+import { Buffer } from 'buffer';
 
 
 import {
@@ -46,11 +47,13 @@ const Add = Experimental.ZkProgram({
 console.log('SnarkyJS loaded');
 
 
-export function zkcode() {
+export function zkcode(buffer: Buffer): Buffer {
+  // your logic here
+
 
 console.log("Connecting to zk server.");
 
-}
+
 
 
 
@@ -70,14 +73,16 @@ console.log("Connecting to zk server.");
 
 const map = new MerkleMap();
 const key = Field(30);
-const value = Field(120);
+const value = Field(buffer);
 map.set(key, value);
 map.set(value, key);
 const rt = map.getRoot().toJSON();
 const wt = map.getWitness(key).toJSON();
 
+    return Buffer.from(rt);
+}
 //console.log(rt, wt);
-
+/*
 const useProof = false;
 
 const Local = Mina.LocalBlockchain({ proofsEnabled: useProof });
@@ -124,3 +129,4 @@ console.log('state after txn1:', num1.toString());
 console.log('Shutting down');
 
 //await shutdown();
+*/
