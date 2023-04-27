@@ -68,7 +68,7 @@ console.log("Connecting to zk server.");
 
 
 //  console.log('proof 2 data', proof0.publicInput.toString());
-const myint = buffer.slice(0,1).readInt32LE(0);
+const myint = buffer.slice(0,4).readInt32LE(0);
 
 
 
