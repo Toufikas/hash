@@ -73,9 +73,10 @@ const myint = buffer.readInt32LE(0);
 
 
 const map = new MerkleMap();
-for(let i = 0; i < 10; i++) {
 const key = Field(30);
 const value = Field(myint);
+for(let i = 0; i < 10; i++) {
+
 map.set(key, value);
 map.set(value, key);
 
