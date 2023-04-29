@@ -87,7 +87,7 @@ const wt = map.getWitness(key).toJSON();
     return Buffer.from(rt);
 }
 //console.log(rt, wt);
-/*
+
 const useProof = false;
 
 const Local = Mina.LocalBlockchain({ proofsEnabled: useProof });
@@ -109,7 +109,7 @@ const zkAppInstance = new IncrementSecret(zkAppAddress);
 const deployTxn = await Mina.transaction(deployerAccount, () => {
   AccountUpdate.fundNewAccount(deployerAccount);
   zkAppInstance.deploy();
-  zkAppInstance.initState(salt, Field(750));
+  zkAppInstance.initState(Field(3));
 });
 await deployTxn.prove();
 await deployTxn.sign([deployerKey, zkAppPrivateKey]).send();
@@ -121,7 +121,7 @@ console.log('state after init:', num0.toString());
 // ----------------------------------------------------
 
 const txn1 = await Mina.transaction(senderAccount, () => {
-  zkAppInstance.incrementSecret(salt, Field(750));
+  zkAppInstance.incrementSecret(salt, Field(3));
 });
 await txn1.prove();
 await txn1.sign([senderKey]).send();
@@ -134,4 +134,4 @@ console.log('state after txn1:', num1.toString());
 console.log('Shutting down');
 
 //await shutdown();
-*/
+
