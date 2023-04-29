@@ -30,7 +30,7 @@ import {
 
 class MerkleWitness20 extends MerkleWitness(20) {}
 
-async function main() {
+
   await isReady;
 
   console.log('SnarkyJS loaded');
@@ -60,7 +60,7 @@ async function main() {
   console.log('Shutting down');
 
   await shutdown();
-}
+
 
 const Add = Experimental.ZkProgram({
   publicInput: Field,
@@ -98,7 +98,7 @@ const Add = Experimental.ZkProgram({
     },
   },
 });
-main();
+
 
 /*
 
