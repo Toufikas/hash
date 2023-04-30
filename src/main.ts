@@ -27,7 +27,7 @@ import {
 } from 'snarkyjs';
 
 
-
+/*
 class MerkleWitness20 extends MerkleWitness(20) {}
 
 
@@ -99,7 +99,7 @@ await isReady;
 
   await shutdown();
 
-
+*/
 /*
 
 
@@ -191,7 +191,7 @@ await deployTxn.sign([deployerKey, zkAppPrivateKey]).send();
 
 // get the initial state of IncrementSecret after deployment
 const num0 = zkAppInstance.x.get();
-console.log('state after init:', num0.toString());
+console.log('state after init:', num0.toBigInt());
 
 // ----------------------------------------------------
 
